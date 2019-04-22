@@ -11,3 +11,5 @@ curl -L https://github.com/multiarch/qemu-user-static/releases/download/v3.1.0-3
 ls
 pwd
 curl -L https://github.com/multiarch/qemu-user-static/releases/download/v3.1.0-3/qemu-arm-static     --output qemu-arm-static
+ls ..
+ls ../..
