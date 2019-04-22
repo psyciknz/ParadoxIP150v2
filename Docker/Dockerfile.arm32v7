@@ -1,6 +1,7 @@
 FROM arm32v7/python:2.7.15-jessie
 
-COPY qemu-arm-static /usr/bin/
+#copy qemu from Docker/hooks (when on DockerHub)
+COPY Docker/hooks/qemu-arm-static /usr/bin/
 
 # based on https://github.com/pfichtner/docker-mqttwarn
 
