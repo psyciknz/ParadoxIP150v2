@@ -13,3 +13,7 @@ QEMU_USER_STATIC_LATEST_TAG=$(curl -s https://api.github.com/repos/multiarch/qem
     | cut -d '"' -f 4)
 
 curl -SL "${QEMU_USER_STATIC_DOWNLOAD_URL}/${QEMU_USER_STATIC_LATEST_TAG}/x86_64_qemu-${QEMU_USER_STATIC_ARCH}-static" -o "../${QEMU_USER_STATIC_ARCH}-static"
+echo 'Directory (should be Docker)'
+ls
+echo 'Directory (should be Where code lives.)'
+ls ../
