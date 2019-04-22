@@ -7,5 +7,5 @@
 # local copy of qemu binary 
 #cp -p $(which qemu-arm-static) .
 # downloads a local copy of qemu on docker-hub build machines
-curl -L https://github.com/multiarch/qemu-user-static/releases/download/v3.1.0-3/qemu-aarch64-static .
-curl -L https://github.com/multiarch/qemu-user-static/releases/download/v3.1.0-3/qemu-arm-static .
+wget https://github.com/multiarch/qemu-user-static/releases/download/v3.1.0-3/qemu-aarch64-static
+wget https://github.com/multiarch/qemu-user-static/releases/download/v3.1.0-3/qemu-arm-static
