@@ -2,7 +2,7 @@ FROM arm64v8/python:2.7.15-jessie
 
 RUN ls 
 #copy qemu from Docker/hooks (when on DockerHub)
-COPY qemu-aarch64-static /usr/bin/
+COPY qemu-arm64v8-static /usr/bin/qemu-aarch64-static
 
 # based on https://github.com/pfichtner/docker-mqttwarn
 
