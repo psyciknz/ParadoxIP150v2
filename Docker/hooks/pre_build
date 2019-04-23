@@ -14,4 +14,4 @@ else
 fi
 
 docker run --rm --privileged multiarch/qemu-user-static:register --reset
-docker run -it --rm multiarch/alpine:${QEMU_USER_STATIC_ARCH}-edge uname -a
+docker run -it --rm multiarch/alpine:armhf-edge uname -a
