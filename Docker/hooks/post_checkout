@@ -20,4 +20,8 @@ echo 'link: ' "${QEMU_USER_STATIC_DOWNLOAD_URL}/${QEMU_USER_STATIC_LATEST_TAG}/q
 curl -SL "${QEMU_USER_STATIC_DOWNLOAD_URL}/${QEMU_USER_STATIC_LATEST_TAG}/qemu-${QEMU_USER_STATIC_ARCH}-static" -o "qemu-${QEMU_USER_STATIC_ARCH}-static"
 echo 'Directory (should be Docker)'
 pwd
-ls
+ls -la
+echo 'Default uname'
+uname -a
+echo 'Qemu version'
+qemu-${QEMU_USER_STATIC_ARCH}-static uname -a
