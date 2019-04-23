@@ -1,2 +1,3 @@
 #!/bin/bash
-docker build -t "$IMAGE_NAME" --file "${DOCKERFILE_PATH}" 
+ls
+docker build -t "$IMAGE_NAME" --file "${DOCKERFILE_PATH}" ../
