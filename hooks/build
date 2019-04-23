@@ -9,6 +9,6 @@ echo ${DOCKERFILE_PATH}
 echo ${BUILD_FILE}
 echo ${IMAGE_NAME}
 docker build \
-    -f "${BUILD_FILE}" \
+    -f "${DOCKERFILE_PATH}" \
     -t "${IMAGE_NAME}" \
     .
