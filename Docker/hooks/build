@@ -3,6 +3,7 @@
 # Get the name of the docker file (without path)
 BUILD_FILE=$(echo Docker/Dockerfile.arm32v7 | cut -d '/' -f 2)
 
+Echo 'Build Uname'
 uname -a
 
 echo 'starting build'
@@ -10,6 +11,6 @@ echo ${DOCKERFILE_PATH}
 echo ${BUILD_FILE}
 echo ${IMAGE_NAME}
 docker build \
-    -f "${DOCKERFILE_PATH}" \
+    -f "${BUILD_FILE}" \
     -t "${IMAGE_NAME}" \
     .
