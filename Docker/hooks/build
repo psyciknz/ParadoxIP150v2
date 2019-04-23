@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Get the name of the docker file (without path)
 BUILD_FILE=$(echo Docker/Dockerfile.arm32v7 | cut -d '/' -f 2)
 
 

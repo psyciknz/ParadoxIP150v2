@@ -16,7 +16,8 @@ QEMU_USER_STATIC_DOWNLOAD_URL="https://github.com/multiarch/qemu-user-static/rel
 QEMU_USER_STATIC_LATEST_TAG=$(curl -s https://api.github.com/repos/multiarch/qemu-user-static/tags | grep 'name.*v[0-9]' | head -n 1 | cut -d '"' -f 4)
 echo 'link: ' "${QEMU_USER_STATIC_DOWNLOAD_URL}/${QEMU_USER_STATIC_LATEST_TAG}/x86_64_qemu-${QEMU_USER_STATIC_ARCH}-static"
 curl -SL "${QEMU_USER_STATIC_DOWNLOAD_URL}/${QEMU_USER_STATIC_LATEST_TAG}/x86_64_qemu-${QEMU_USER_STATIC_ARCH}-static" -o "../qemu-${QEMU_USER_STATIC_ARCH}-static"
-echo 'Directory (should be Docker)'
+echo 'Directory (should be Docker) ${PWD}'
+
 ls
-echo 'Directory (should be Where code lives.)'
+echo 'Directory (should be Where code lives.   Qemu in here)'
 ls ../
