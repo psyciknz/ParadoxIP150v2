@@ -24,4 +24,4 @@ ls -la
 echo 'Default uname'
 uname -a
 echo 'Qemu version'
-qemu-${QEMU_USER_STATIC_ARCH}-static uname -a
+./qemu-${QEMU_USER_STATIC_ARCH}-static uname -a
