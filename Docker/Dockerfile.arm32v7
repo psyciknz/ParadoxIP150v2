@@ -5,6 +5,8 @@ COPY qemu-arm-static /usr/bin/
 
 # based on https://github.com/pfichtner/docker-mqttwarn
 
+RUN /bin/bash -c 'uname -a'
+
 # install python libraries (TODO: any others?)
 RUN pip install paho-mqtt requests 
 
