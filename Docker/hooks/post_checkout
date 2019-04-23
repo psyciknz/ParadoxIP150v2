@@ -19,5 +19,6 @@ curl -SL "${QEMU_USER_STATIC_DOWNLOAD_URL}/${QEMU_USER_STATIC_LATEST_TAG}/x86_64
 cp ../qemu-${QEMU_USER_STATIC_ARCH}-static ./
 echo 'Directory (should be Docker)'
 pwd
+ls
 echo 'Directory (should be Where code lives.   Qemu in here)'
 ls ../
