@@ -13,9 +13,17 @@ else
 fi
 
 # Fail on empty params
-if [[ -z ${REPO} || -z ${IMAGE_NAME} || -z ${TARGET_ARCHES} ]]; then
+if [[ -z ${IMAGE_NAME} || -z ${TARGET_ARCHES} ]]; then
   echo ERROR: Please set build parameters.
   exit 1
+fi
+
+if [ -z ${REPO} ]; then
+   docker login --username ${DOCKERUSER} --password ${DOCKERPASSWORD}
+   NEWREPO=''
+else 
+   NEWREPO="${REPO}/"
+   echo $NEWREPO
 fi
 
 # Determine OS and Arch.
@@ -60,18 +68,21 @@ for docker_arch in ${TARGET_ARCHES}; do
   else
     sed -i  "s/__CROSS_//g" Dockerfile.${docker_arch}
   fi
-  ${docker_bin_path} build -f Dockerfile.${docker_arch} -t ${REPO}/${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION} .
-  ${docker_bin_path} push ${REPO}/${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION}
-  arch_images="${arch_images} ${REPO}/${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION}"
+  #${docker_bin_path} build -f Dockerfile.${docker_arch} -t ${REPO}/${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION} .
+  ${docker_bin_path} build -f Dockerfile.${docker_arch} -t ${NEWREPO}${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION} .
+  #${docker_bin_path} push ${NEWREPO}/${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION}
+  ${docker_bin_path} push ${NEWREPO}${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION}
+  #arch_images="${arch_images} ${NEWREPO}/${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION}"
+  arch_images="${arch_images} ${NEWREPO}${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION}"
   rm Dockerfile.${docker_arch}
 done
 
-echo INFO: Creating fat manifest for ${REPO}/${IMAGE_NAME}:${IMAGE_VERSION}
+echo INFO: Creating fat manifest for ${NEWREPO}${IMAGE_NAME}:${IMAGE_VERSION}
 echo INFO: with subimages: ${arch_images}
-if [ -d ${HOME}/.docker/manifests/docker.io_${REPO}_${IMAGE_NAME}-${IMAGE_VERSION} ]; then
-  rm -rf ${HOME}/.docker/manifests/docker.io_${REPO}_${IMAGE_NAME}-${IMAGE_VERSION}
+if [ -d ${HOME}/.docker/manifests/docker.io_${NEWREPO}_${IMAGE_NAME}-${IMAGE_VERSION} ]; then
+  rm -rf ${HOME}/.docker/manifests/docker.io_${NEWREPO}_${IMAGE_NAME}-${IMAGE_VERSION}
 fi
-docker manifest create --amend ${REPO}/${IMAGE_NAME}:${IMAGE_VERSION} ${arch_images}
+docker manifest create --amend ${NEWREPO}${IMAGE_NAME}:${IMAGE_VERSION} ${arch_images}
 for docker_arch in ${TARGET_ARCHES}; do
   case ${docker_arch} in
     amd64       ) annotate_flags="" ;;
@@ -79,7 +90,7 @@ for docker_arch in ${TARGET_ARCHES}; do
     arm64v8     ) annotate_flags="--os linux --arch arm64 --variant armv8" ;;
   esac
   echo INFO: Annotating arch: ${docker_arch} with \"${annotate_flags}\"
-  docker manifest annotate ${REPO}/${IMAGE_NAME}:${IMAGE_VERSION} ${REPO}/${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION} ${annotate_flags}
+  docker manifest annotate ${NEWREPO}${IMAGE_NAME}:${IMAGE_VERSION} ${NEWREPO}${IMAGE_NAME}:${docker_arch}-${IMAGE_VERSION} ${annotate_flags}
 done
-echo INFO: Pushing ${REPO}/${IMAGE_NAME}:${IMAGE_VERSION}
-docker manifest push ${REPO}/${IMAGE_NAME}:${IMAGE_VERSION}
+echo INFO: Pushing ${NEWREPO}${IMAGE_NAME}:${IMAGE_VERSION}
+docker manifest push ${NEWREPO}${IMAGE_NAME}:${IMAGE_VERSION}

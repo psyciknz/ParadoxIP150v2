@@ -152,5 +152,10 @@ docker run -v $PWD:/opt/paradox/conf psyciknz/paradoxip
 
 I do have an arm32v7 (Raspberry Pi 3) image on docker hub as well:
 ```
-docker run -v $PWD:/opt/paradox/conf psyciknz/paradoxip:arm32v7:latest
+docker run -v $PWD:/opt/paradox/conf psyciknz/paradoxip:arm32v7-(version)
 ```
+and Arm64 (Odroid C2)
+```
+docker run -v $PWD:/opt/paradox/conf psyciknz/paradoxip:arm64v8-(version)
+```
+The Arm images have to be manually kicked off unfortunately, I can't automate those direct from github.
