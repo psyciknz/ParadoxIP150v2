@@ -295,7 +295,9 @@ class paradox:
     zoneTotal = 0
     zoneStatus = ['']
     zoneNames = {}
+    homieZoneNodes = {}
     partitions = {}
+    homiePartitionNodes = {}
     zonePartition = None
     partitionStatus = None
     partitionName = None
@@ -309,7 +311,7 @@ class paradox:
     keepalivecount = 0
     
 
-    def __init__(self, _transport, client,_encrypted=0, _retries=10, _alarmeventmap="ParadoxMG5050",
+    def __init__(self, _transport, homie, client,_encrypted=0, _retries=10, _alarmeventmap="ParadoxMG5050",
                  _alarmregmap="ParadoxMG5050"):
         self.comms = _transport  # instance variable unique to each instance
         self.retries = _retries
@@ -317,6 +319,7 @@ class paradox:
         self.alarmeventmap = _alarmeventmap
         self.alarmregmap = _alarmregmap
         self.client = client
+        self.homie = homie
 
         # MyClass = getattr(importlib.import_module("." + self.alarmmodel + "EventMap", __name__))
 
@@ -527,43 +530,7 @@ class paradox:
         # 2019-04-04 - Switch to using the KeepAliveStatus1 reply processor rather than do it again 
         #              helps with all the partition name names for 2.0.11
         self.keepAliveStatus0(data,Debug_Mode,0)
-        #print "heart beat status 0 reply: <--" + " ".join(hex(ord(i)) for i in data)
-        #print "Value 16 ({}) and 17 ({}) ".format(ord(data[0]), ord(data[1]))
-        # if data[1] == '\x00' and (data[0] == '\x50' or data[0] == '\x52'):
-        #     #print "Year :  {}{}".format(ord(data[9]),ord(data[10]))
-        #     #print "Month : {}".format( ord(data[11]))
-        #     #print "Day :   {}".format(ord(data[12]))
-        #     #print "Hour:   {}".format( ord(data[13]))
-        #     #print "minute: {}".format( ord(data[14]))
-        #     #print "ac:  {}".format( ord(data[15]))
-        #     #print "DC:  {}".format( ord(data[16]))
-        #     #print "BDC: {}".format(ord(data[17]))
-        #     # Skip to zone status
-        #     reply = reply[25:]
-        #     reply = reply[1:]
-        # else:
-        #     #print "No 00 record found"
-        #     # Skip to zone status
-        #     reply = reply[25:]
-        #     #reply = reply[10:] # skip date, time and voltages
-        #     reply = reply[10:]
         
-        
-        
-        
-        # for x in range(4):
-        #   data = ord(reply[x])
-        #   for y in range(8):
-        #     bit = data & 1
-        #     data = data / 2
-        #     itemNo = x * 8 + y + 1
-        #     if itemNo in self.zoneNames.keys():
-        #       location = self.zoneNames[itemNo]
-        #       if len(location) > 0:
-        #         zoneState = ZonesOn if bit else ZonesOff
-        #         #print "Publishing initial zone state (state:" + zoneState + ", zone:" + location + ")"
-        #         #client.publish(Topic_Publish_ZoneState + "/" + location, "ON" if bit else "OFF", qos=1, retain=True)
-        #         self.client.publish(Topic_Publish_ZoneState + "/" + location, zoneState, qos=1, retain=True)
         time.sleep(0.3)
         message =  "\x50\x00\x80\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         message += "\x00\x00\x00\x00\x00\x00\x00\x00\x00\xd1\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee\xee"
@@ -580,17 +547,6 @@ class paradox:
         #              helps with all the partition name names for 2.0.11
         self.keepAliveStatus1(data,Debug_Mode,0)
 
-
-        # reply = reply[33:]
-        # alarmState = ord(reply[0])
-        # alarmState = ZonesOn if (alarmState & 1) else ZonesOff
-        # #print "Publishing initial alarm state (state:" + alarmState + ")"
-        # if Debug_Mode >= 1:
-        #     logging.debug("updateZoneAndAlarmStatus: Publishing initial alarm state (state:" + alarmState + ")")
-
-        # #client.publish(Topic_Publish_ArmState, alarmState, qos=1, retain=True)
-        # if Startup_Publish_All_Info == "True":
-        #     self.client.publish(Topic_Publish_ArmState,  self.Alarm_Partition_States[alarmState], qos=1, retain=True)
         time.sleep(0.3)
         return
 
@@ -669,8 +625,15 @@ class paradox:
                     topic = func.split("Label")[0]
                     if topic[0].upper() + topic[1:] + "s" == "Zones":
                         self.zoneNames = completed_dict
+                        for zone in self.zoneNames:
+                            contactNode = Homie.Node(zone, "contact")
+                            self.homieZoneNodes[zone] = contactNode
+
                     elif topic.upper() == "PARTITION":
                         self.partitions = completed_dict
+                        for partition in self.partitions:
+                            contactNode = Homie.Node(zone, "partition")
+                            self.homieZoneNodes[zone] = contactNode
 
                     logging.info("updateAllLabels:  Topic being published " + Topic_Publish_Labels + "/" + topic[0].upper() + topic[1:] + "s" + ';'.join('{}{}'.format(key, ":" + val) for key, val in completed_dict.items()))
                     self.client.publish(Topic_Publish_Labels + "/" + topic[0].upper() + topic[1:] + "s",
@@ -1273,6 +1236,21 @@ if __name__ == '__main__':
                     except:
                        pass
 
+                homiedata = {}
+                #construct the homie config.json.
+                #{
+                #    "HOST": "iot.eclipse.org",
+                #    "PORT": 1883,
+                #    "KEEPALIVE": 10,
+                #    "USERNAME": "",
+                #    "PASSWORD": "",
+                #    "CA_CERTS": "",
+                #    "DEVICE_ID": "xxxxxxxx",
+                #    "DEVICE_NAME": "xxxxxxxx",
+                #    "TOPIC": "homie"
+                #}
+                homiedata['DEVICE_ID'] = "paradox"
+                homiedata['DEVICE_NAME'] = "paradox"
 
                 Alarm_Model = Config.get("Alarm", "Alarm_Model")
                 Alarm_Registry_Map = Config.get("Alarm", "Alarm_Registry_Map")
@@ -1285,11 +1263,20 @@ if __name__ == '__main__':
                 IP150_IP = Config.get("IP150", "IP")
                 IP150_Port = int(Config.get("IP150", "IP_Software_Port"))
                 MQTT_IP = Config.get("MQTT Broker", "IP")
+                homiedata['HOST'] = MQTT_IP
+
                 MQTT_Port = int(Config.get("MQTT Broker", "Port"))
+                homiedata['PORT'] = MQTT_Port
+
                 mqtt_username = Config.get("MQTT Broker", "Mqtt_Username")
+                homiedata['USERNAME'] = mqtt_username
+
                 mqtt_password = Config.get("MQTT Broker", "Mqtt_Password")
+                homiedata['PASSWORD'] = mqtt_password
 
                 Topic_Publish_Events = Config.get("MQTT Topics", "Topic_Publish_Events")
+                homiedata['TOPIC'] = Config.get("MQTT Topics", "Base_Topic")
+
                 Events_Payload_Numeric = int(Config.get("MQTT Topics", "Events_Payload_Numeric"))
                 Topic_Subscribe_Control = Config.get("MQTT Topics", "Topic_Subscribe_Control")
                 Startup_Publish_All_Info = Config.get("MQTT Topics", "Startup_Publish_All_Info")
@@ -1318,6 +1305,11 @@ if __name__ == '__main__':
                    logging.info("Setting loglevel to debug")
                    logging.debug("Logging Set to debug")
                    logging.info("logging set to debug") 
+
+                json_data = json.dumps(homiedata)
+                Homie = homie.Homie(json_data)
+                Homie.setFirmware("paradox-monitor", version)
+
 
                 logging.info("config.ini file read successfully: %d" % Debug_Mode)
                 #print "config read"
@@ -1391,7 +1383,7 @@ if __name__ == '__main__':
                                "State Machine 2, Connected to IP Module, unlocking...",
                                1, True)
 
-                myAlarm = paradox(comms, client,0, 3, Alarm_Event_Map, Alarm_Registry_Map)
+                myAlarm = paradox(comms, homie,client,0, 3, Alarm_Event_Map, Alarm_Registry_Map)
 
                 #loading partition states from config so user can customise.
                 if Config.has_section('Alarm_Partition_States'):
