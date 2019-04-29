@@ -632,8 +632,8 @@ class paradox:
                     elif topic.upper() == "PARTITION":
                         self.partitions = completed_dict
                         for partition in self.partitions:
-                            contactNode = Homie.Node(zone, "partition")
-                            self.homieZoneNodes[zone] = contactNode
+                            contactNode = Homie.Node(partition, "partition")
+                            self.homieZoneNodes[partition] = contactNode
 
                     logging.info("updateAllLabels:  Topic being published " + Topic_Publish_Labels + "/" + topic[0].upper() + topic[1:] + "s" + ';'.join('{}{}'.format(key, ":" + val) for key, val in completed_dict.items()))
                     self.client.publish(Topic_Publish_Labels + "/" + topic[0].upper() + topic[1:] + "s",
@@ -641,8 +641,14 @@ class paradox:
                 else:
                     if topic[0].upper() + topic[1:] + "s" == "Zones":
                         self.zoneNames = completed_dict
+                        for zone in self.zoneNames:
+                            contactNode = Homie.Node(zone, "contact")
+                            self.homieZoneNodes[zone] = contactNode
                     elif topic.upper() == "PARTITION":
                         self.partitions = completed_dict
+                        for partition in self.partitions:
+                            contactNode = Homie.Node(partition, "partition")
+                            self.homieZoneNodes[partition] = contactNode
 
                 #print self.zoneNames
 
