@@ -13,7 +13,7 @@ import logging.handlers
 import os.path
 import json
 
-version = "2.0.13"
+version = "2.1.0"
 
 # Alarm controls can be given in payload, e.g. Paradox/C/P1, payl = Disarm
 ################################################################################################
@@ -21,6 +21,9 @@ version = "2.0.13"
 ################################################################################################
 # Change History
 ################################################################################################
+# 2019-04-29 2.1.0 
+# - Adding Homie Support https://github.com/jalmeroth/homie-python
+#
 # 2019-04-03 2.0.13
 # - [kovacsbalu] - Adding partition name on live events
 # - [psyciknz]   - Adding partition names on keepalive messages (currently only partition 1)
