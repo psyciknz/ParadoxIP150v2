@@ -1558,7 +1558,7 @@ if __name__ == '__main__':
 
             logging.info("State04:Polling Disabled")
 
-        elif Polling_Enabled == 1 and State_Machine <= 4:
+        elif Polling_Enabled == 1 and State_Machine > 4:
             logging.info("Polling enabled false, setting statement 2")
             State_Machine = 2
 
