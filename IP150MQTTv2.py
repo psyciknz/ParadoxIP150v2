@@ -12,6 +12,7 @@ import logging
 import logging.handlers
 import os.path
 import json
+import homie
 
 version = "2.1.0"
 
@@ -705,11 +706,13 @@ class paradox:
                                     #print "Events 7-{} 8-{}- Reply: {}".format(ord(message[7]),ord(message[8]),reply)
                                     logging.debug("Events 7-{} 8-{}- Reply: {}".format(ord(message[7]),ord(message[8]),reply))
 
+                                
                                 try:
                                     if (ord(message[7]) == 0 or ord(message[7]) ==1) and (self.zoneNames is not None and len(self.zoneNames) > 0):
                                         if Debug_Mode >= 2:
                                             logging.debug("Message is a 1 or 0, and self.Zonenames not empty")
                                         zonename = self.zoneNames[ord(message[8])]
+                                        contactNode = self.homieZoneNodes[zonename]
                                         if zonename != location:
                                             logging.info("Zonename from labels {0} does not match event location {1}, updating".format(zonename,location))
                                             self.zoneNames[ord(message[8])]= location
@@ -724,10 +727,12 @@ class paradox:
                                     #Zone state off
                                     logging.info("Publishing ZONE event \"%s\" for \"%s\" =  %s" % (Topic_Publish_ZoneState, location, ZonesOff))
                                     self.client.publish(Topic_Publish_ZoneState + "/" + location,ZonesOff, qos=1, retain=True)
+                                    contactNode.setProperty("on").send(ZonesOff)
                                 elif ord(message[7]) == 1:
                                     #zone state on
                                     logging.info("Publishing ZONE event \"%s\" for \"%s\" =  %s" % (Topic_Publish_ZoneState, location, ZonesOn))
                                     self.client.publish(Topic_Publish_ZoneState + "/" + location,ZonesOn, qos=1, retain=True)
+                                    contactNode.setProperty("on").send(ZonesOn)
                                 elif ord(message[7]) == 2 and (ord(message[8]) == 11 or ord(message[8]) == 3):   #Disarm
                                     #partition disarmed event
                                     logging.info("Publishing DISARMED event \"%s\" =  \"%s\"" % (Topic_Publish_ArmState, self.Alarm_Partition_States['DISARMED']))
@@ -1312,8 +1317,13 @@ if __name__ == '__main__':
                    logging.debug("Logging Set to debug")
                    logging.info("logging set to debug") 
 
+
                 json_data = json.dumps(homiedata)
-                Homie = homie.Homie(json_data)
+                with open('config.json', 'w') as json_file:  
+                    json.dump(homiedata, json_file)
+
+                homieconfig = homie.loadConfigFile('config.json')
+                Homie = homie.Homie(homieconfig)
                 Homie.setFirmware("paradox-monitor", version)
 
 
@@ -1353,6 +1363,7 @@ if __name__ == '__main__':
                 client.publish(Topic_Publish_AppState + "/$version",version,retain=True)
 
                 client.loop_start()
+                Homie.setup()
 
                 #client.subscribe(Topic_Subscribe_Control + "#")
 
